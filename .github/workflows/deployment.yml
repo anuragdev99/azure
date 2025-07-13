@@ -1,61 +1,61 @@
-name: Bootstrap & Terraform
+name: Bootstrap & Terraform Azure VM & Key Vault
 
-on: workflow_dispatch
+on:
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  bootstrap-backend:
+  terraform:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Azure Login
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure via OIDC
         uses: azure/login@v1
         with:
+          auth-type: oidc
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Create RG if missing
+      - name: Bootstrap backend resources
         run: |
           az group create \
             --name rg-tfstate \
             --location eastus
-
-      - name: Create Storage Account if missing
-        run: |
           az storage account create \
             --name tfstate2tuff \
             --resource-group rg-tfstate \
             --sku Standard_LRS \
             --kind StorageV2 \
             --https-only true \
-            || echo "SA exists, skipping"
-
-      - name: Create Container if missing
-        run: |
+            --only-show-errors || echo "Storage exists, skipping"
           az storage container create \
             --name tfstate \
             --account-name tfstate2tuff \
-            || echo "Container exists, skipping"
+            --only-show-errors || echo "Container exists, skipping"
 
-  terraform:
-    needs: bootstrap-backend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Export Azure environment variables
+        run: |
+          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}"         >> $GITHUB_ENV
+          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}"        >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
 
-      - name: Write backend configuration
+      - name: Write backend config
         run: |
           cat <<EOF > backend.tf
           terraform {
