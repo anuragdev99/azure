@@ -1,4 +1,6 @@
-name: Bootstrap & Terraform Azure VM & Key Vault
+# File: .github/workflows/terraform-azure-vm-kv.yml
+
+name: Terraform Azure VM & Key Vault
 
 on:
   workflow_dispatch: {}
@@ -22,7 +24,6 @@ jobs:
       - name: Login to Azure via OIDC
         uses: azure/login@v1
         with:
-          auth-type: oidc
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -32,19 +33,21 @@ jobs:
           az group create \
             --name rg-tfstate \
             --location eastus
+
           az storage account create \
-            --name tfstate2tuff \
+            --name tfstate123tuffs \
             --resource-group rg-tfstate \
             --sku Standard_LRS \
             --kind StorageV2 \
             --https-only true \
-            --only-show-errors || echo "Storage exists, skipping"
+            --output none || echo "Storage account exists, skipping"
+
           az storage container create \
             --name tfstate \
-            --account-name tfstate2tuff \
-            --only-show-errors || echo "Container exists, skipping"
+            --account-name tfstate123tuffs \
+            --output none || echo "Container exists, skipping"
 
-      - name: Export Azure environment variables
+      - name: Export ARM_* env vars
         run: |
           echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}"         >> $GITHUB_ENV
@@ -55,13 +58,13 @@ jobs:
         with:
           terraform_version: 1.5.7
 
-      - name: Write backend config
+      - name: Write backend configuration
         run: |
           cat <<EOF > backend.tf
           terraform {
             backend "azurerm" {
               resource_group_name   = "rg-tfstate"
-              storage_account_name  = "tfstate2tuff"
+              storage_account_name  = "tfstate123tuffs"
               container_name        = "tfstate"
               key                   = "prod/terraform.tfstate"
             }
@@ -77,10 +80,10 @@ jobs:
           EOF
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=tfplan -input=false
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve -input=false tfplan
