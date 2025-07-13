@@ -1,4 +1,4 @@
-name: Azure-Deployment
+name: Azure VM & Key Vault Deployment
 
 on:
   workflow_dispatch:
@@ -25,7 +25,15 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.12.2
+          terraform_version: 1.5.7
+
+      - name: Write terraform.tfvars
+        run: |
+          cat > terraform.tfvars <<EOF
+          ssh_public_key = <<KEY
+          ${{ secrets.SSH_PUBLIC_KEY }}
+          KEY
+          EOF
 
       - name: Terraform Init
         run: terraform init
