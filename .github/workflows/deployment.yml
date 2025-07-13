@@ -1,0 +1,86 @@
+name: Bootstrap & Terraform
+
+on: workflow_dispatch
+
+jobs:
+  bootstrap-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Create RG if missing
+        run: |
+          az group create \
+            --name rg-tfstate \
+            --location eastus
+
+      - name: Create Storage Account if missing
+        run: |
+          az storage account create \
+            --name tfstate2tuff \
+            --resource-group rg-tfstate \
+            --sku Standard_LRS \
+            --kind StorageV2 \
+            --https-only true \
+            || echo "SA exists, skipping"
+
+      - name: Create Container if missing
+        run: |
+          az storage container create \
+            --name tfstate \
+            --account-name tfstate2tuff \
+            || echo "Container exists, skipping"
+
+  terraform:
+    needs: bootstrap-backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+
+      - name: Write backend configuration
+        run: |
+          cat <<EOF > backend.tf
+          terraform {
+            backend "azurerm" {
+              resource_group_name   = "rg-tfstate"
+              storage_account_name  = "tfstate2tuff"
+              container_name        = "tfstate"
+              key                   = "prod/terraform.tfstate"
+            }
+          }
+          EOF
+
+      - name: Write terraform.tfvars
+        run: |
+          cat <<EOF > terraform.tfvars
+          ssh_public_key = <<KEY
+          ${{ secrets.SSH_PUBLIC_KEY }}
+          KEY
+          EOF
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
