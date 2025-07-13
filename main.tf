@@ -1,39 +1,3 @@
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "rg-tfstate"
-    storage_account_name = "tfstate123tuffs"
-    container_name       = "tfstate"
-    key                  = "ubuntu-vm-keyvault.tfstate"
-  }
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.105.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
-variable "ssh_public_key" {
-  type        = string
-  description = "Public SSH key for the VM admin user"
-}
-
-variable "tenant_id" {
-  type        = string
-  description = "Azure Tenant ID"
-}
-
-variable "allowed_ip" {
-  type        = string
-  description = "Your laptop public IP in CIDR (e.g. 203.0.113.4/32)"
-  default     = "0.0.0.0/0"
-}
-
 resource "azurerm_resource_group" "main" {
   name     = "rg-ubuntu-vault"
   location = "East US"
