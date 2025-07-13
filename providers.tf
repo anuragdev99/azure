@@ -16,9 +16,6 @@ terraform {
 # Azurerm *must* include a features{} block
 provider "azurerm" {
   features {}
-
-  # ← Tell the provider which subscription to target
-  subscription_id = env("ARM_SUBSCRIPTION_ID")
 }
 
 # AzureAD can pick up ARM_TENANT_ID and ARM_CLIENT_ID automatically
