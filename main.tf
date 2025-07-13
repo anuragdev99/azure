@@ -65,18 +65,22 @@ resource "azurerm_linux_virtual_machine" "ubuntu" {
 }
 
 resource "azurerm_key_vault" "vault" {
-  name                        = "kv-ubuntu-access"
-  location                    = azurerm_resource_group.main.location
-  resource_group_name         = azurerm_resource_group.main.name
-  tenant_id                   = var.tenant_id
-  sku_name                    = "standard"
-  soft_delete_enabled         = true
-  purge_protection_enabled    = true
+  name                = "kv-ubuntu-access"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tenant_id           = var.tenant_id
+  sku_name            = "standard"
+
+  # removed soft_delete_enabled & purge_protection_enabled
+  # Azure now enforces soft-delete with a 90-day retention by default
 
   access_policy {
     tenant_id = var.tenant_id
     object_id = azurerm_linux_virtual_machine.ubuntu.identity[0].principal_id
 
-    secret_permissions = ["get", "list"]
+    secret_permissions = [
+      "get",
+      "list",
+    ]
   }
 }
