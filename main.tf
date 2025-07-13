@@ -1,7 +1,6 @@
 // ──────────────────────────────────────────────────────────────────────────
-// Azure Resources for Ubuntu VM + Key Vault
+// Resource Group, VNet & Subnet
 // ──────────────────────────────────────────────────────────────────────────
-
 resource "azurerm_resource_group" "main" {
   name     = "rg-ubuntu-vault"
   location = "East US"
@@ -22,7 +21,7 @@ resource "azurerm_subnet" "subnet" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Public IP for the VM
+// Public IP
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_public_ip" "vm" {
   name                = "pip-ubuntu-vm"
@@ -34,12 +33,59 @@ resource "azurerm_public_ip" "vm" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Network Interface with attached Public IP
+// Network Security Group (SSH, HTTP, HTTPS from allowed_ip)
+// ──────────────────────────────────────────────────────────────────────────
+resource "azurerm_network_security_group" "nsg" {
+  name                = "nsg-ubuntu-vm"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = var.allowed_ip
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = var.allowed_ip
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTPS"
+    priority                   = 300
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = var.allowed_ip
+    destination_address_prefix = "*"
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// NIC with Public IP + NSG
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_network_interface" "nic" {
   name                = "nic-ubuntu"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+
+  network_security_group_id = azurerm_network_security_group.nsg.id
 
   ip_configuration {
     name                          = "internal"
@@ -50,7 +96,7 @@ resource "azurerm_network_interface" "nic" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Ubuntu VM with System-Assigned Identity
+// Ubuntu VM (System-Assigned Identity)
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_linux_virtual_machine" "ubuntu" {
   name                  = "ubuntu-vm"
@@ -85,7 +131,7 @@ resource "azurerm_linux_virtual_machine" "ubuntu" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Key Vault accessible by the VM’s Managed Identity
+// Key Vault with VM Access Policy
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_key_vault" "vault" {
   name                = "kv-ubuntu-access"
