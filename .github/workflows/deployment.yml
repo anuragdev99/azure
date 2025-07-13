@@ -1,5 +1,3 @@
-# File: .github/workflows/terraform-azure-vm-kv.yml
-
 name: Terraform Azure VM & Key Vault
 
 on:
@@ -24,52 +22,14 @@ jobs:
       - name: Login to Azure via OIDC
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Bootstrap backend resources
-        run: |
-          az group create \
-            --name rg-tfstate \
-            --location eastus
-
-          az storage account create \
-            --name tfstate123tuffs \
-            --resource-group rg-tfstate \
-            --sku Standard_LRS \
-            --kind StorageV2 \
-            --https-only true \
-            --output none || echo "Storage account exists, skipping"
-
-          az storage container create \
-            --name tfstate \
-            --account-name tfstate123tuffs \
-            --output none || echo "Container exists, skipping"
-
-      - name: Export ARM_* env vars
-        run: |
-          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}"         >> $GITHUB_ENV
-          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}"        >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.7
-
-      - name: Write backend configuration
-        run: |
-          cat <<EOF > backend.tf
-          terraform {
-            backend "azurerm" {
-              resource_group_name   = "rg-tfstate"
-              storage_account_name  = "tfstate123tuffs"
-              container_name        = "tfstate"
-              key                   = "prod/terraform.tfstate"
-            }
-          }
-          EOF
 
       - name: Write terraform.tfvars
         run: |
