@@ -79,8 +79,8 @@ resource "azurerm_key_vault" "vault" {
     object_id = azurerm_linux_virtual_machine.ubuntu.identity[0].principal_id
 
     secret_permissions = [
-      "get",
-      "list",
+      "Get",
+      "List",
     ]
   }
 }
