@@ -1,5 +1,5 @@
 // ──────────────────────────────────────────────────────────────────────────
-// Resource Group, VNet, Subnet
+// Resource Group, VNet & Subnet
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_resource_group" "main" {
   name     = "rg-ubuntu-vault"
@@ -33,7 +33,7 @@ resource "azurerm_public_ip" "vm" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Network Security Group for SSH/HTTP/HTTPS
+// Network Security Group (SSH/HTTP/HTTPS from allowed_ip)
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_network_security_group" "nsg" {
   name                = "nsg-ubuntu-vm"
@@ -78,7 +78,7 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// NIC with Public IP + NSG attached inside ip_configuration
+// Network Interface (Public IP + NSG attached inside ip_configuration)
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_network_interface" "nic" {
   name                = "nic-ubuntu"
@@ -96,7 +96,7 @@ resource "azurerm_network_interface" "nic" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Linux VM (System-Assigned Identity + SSH Key)
+// Ubuntu VM (System-Assigned Identity + SSH Key)
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_linux_virtual_machine" "ubuntu" {
   name                  = "ubuntu-vm"
@@ -131,7 +131,7 @@ resource "azurerm_linux_virtual_machine" "ubuntu" {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Key Vault with VM’s Managed Identity Access
+// Key Vault accessible by the VM’s Managed Identity
 // ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_key_vault" "vault" {
   name                = "kv-ubuntu-access"
