@@ -1,6 +1,39 @@
-// ──────────────────────────────────────────────────────────────────────────
-// Resource Group, VNet & Subnet
-// ──────────────────────────────────────────────────────────────────────────
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "tfstate123tuffs"
+    container_name       = "tfstate"
+    key                  = "ubuntu-vm-keyvault.tfstate"
+  }
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.105.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+variable "ssh_public_key" {
+  type        = string
+  description = "Public SSH key for the VM admin user"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "Azure Tenant ID"
+}
+
+variable "allowed_ip" {
+  type        = string
+  description = "Your laptop public IP in CIDR (e.g. 203.0.113.4/32)"
+  default     = "0.0.0.0/0"
+}
+
 resource "azurerm_resource_group" "main" {
   name     = "rg-ubuntu-vault"
   location = "East US"
@@ -20,9 +53,6 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Public IP
-// ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_public_ip" "vm" {
   name                = "pip-ubuntu-vm"
   location            = azurerm_resource_group.main.location
@@ -32,9 +62,6 @@ resource "azurerm_public_ip" "vm" {
   sku               = "Basic"
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Network Security Group (SSH, HTTP, HTTPS from allowed_ip)
-// ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_network_security_group" "nsg" {
   name                = "nsg-ubuntu-vm"
   location            = azurerm_resource_group.main.location
@@ -77,15 +104,11 @@ resource "azurerm_network_security_group" "nsg" {
   }
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// NIC with Public IP + NSG
-// ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_network_interface" "nic" {
-  name                = "nic-ubuntu"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  name                        = "nic-ubuntu"
+  location                    = azurerm_resource_group.main.location
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_id   = azurerm_network_security_group.nsg.id
 
   ip_configuration {
     name                          = "internal"
@@ -95,9 +118,6 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Ubuntu VM (System-Assigned Identity)
-// ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_linux_virtual_machine" "ubuntu" {
   name                  = "ubuntu-vm"
   resource_group_name   = azurerm_resource_group.main.name
@@ -130,9 +150,6 @@ resource "azurerm_linux_virtual_machine" "ubuntu" {
   }
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-// Key Vault with VM Access Policy
-// ──────────────────────────────────────────────────────────────────────────
 resource "azurerm_key_vault" "vault" {
   name                = "kv-ubuntu-access"
   location            = azurerm_resource_group.main.location
