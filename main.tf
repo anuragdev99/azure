@@ -12,3 +12,4 @@ module "keyvault" {
   tenant_id    = var.tenant_id
   vm_object_id = module.vm.vm_object_id
 }
+
