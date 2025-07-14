@@ -29,11 +29,23 @@ jobs:
         run: terraform init
       - name: Terraform Plan
         run: |
-          terraform plan \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
-            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
-      - name: Terraform Apply
-        run: |
-          terraform apply -auto-approve \
-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
-            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+       - name: Terraform Plan
+         run: |
+-          terraform plan \
+-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
+-            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
++          terraform plan \
++            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
++            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
++            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+
+       - name: Terraform Apply
+         run: |
+-          terraform apply -auto-approve \
+-            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
+-            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
++          terraform apply -auto-approve \
++            -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
++            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
++            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+
