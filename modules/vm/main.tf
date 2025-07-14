@@ -1,15 +1,16 @@
 resource "azurerm_public_ip" "public_ip" {
   name                = "public-ip"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  resource_group_name = var.rg_name
   allocation_method   = "Static"
   sku                 = "Basic"
 }
 
 resource "azurerm_network_interface" "nic" {
   name                = "nic-main"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  resource_group_name = var.rg_name
+
 
   ip_configuration {
     name                          = "internal"
@@ -21,8 +22,8 @@ resource "azurerm_network_interface" "nic" {
 
 resource "azurerm_linux_virtual_machine" "vm" {
   name                            = "ubuntu-vm"
-  resource_group_name             = azurerm_resource_group.rg.name
-  location                        = azurerm_resource_group.rg.location
+  location                        = var.location
+  resource_group_name             = var.rg_name
   size                            = "Standard_B1s"
   admin_username                  = "azureuser"
   network_interface_ids           = [azurerm_network_interface.nic.id]
