@@ -1,14 +1,14 @@
 module "network" {
-  source = "./resources/network"
+  source = "./modules/network"
 }
 
 module "vm" {
-  source         = "./resources/vm"
+  source         = "./modules/vm"
   ssh_public_key = var.ssh_public_key
 }
 
 module "keyvault" {
-  source       = "./resources/keyvault"
+  source       = "./modules/keyvault"
   tenant_id    = var.tenant_id
   vm_object_id = module.vm.vm_object_id
 }
