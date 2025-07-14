@@ -1,0 +1,25 @@
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
+}
+
+resource "azurerm_key_vault" "kv" {
+  name                        = "kv-vm-${random_string.suffix.result}"
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
+  tenant_id                   = var.tenant_id
+  sku_name                    = "standard"
+  soft_delete_enabled         = true
+  purge_protection_enabled    = false
+
+  access_policy {
+    tenant_id = var.tenant_id
+    object_id = var.vm_object_id
+    secret_permissions = ["get", "list"]
+  }
+}
+
+output "key_vault_name" {
+  value = azurerm_key_vault.kv.name
+}
