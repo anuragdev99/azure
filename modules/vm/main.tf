@@ -3,7 +3,7 @@ resource "azurerm_public_ip" "public_ip" {
   location            = var.location
   resource_group_name = var.rg_name
   allocation_method   = "Static"
-  sku                 = "Basic"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "nic" {
