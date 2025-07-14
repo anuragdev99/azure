@@ -12,3 +12,8 @@ variable "location" {
   description = "Resource group location"
   type        = string
 }
+
+variable "subnet_id" {
+  description = "Subnet ID where VM NIC will attach"
+  type        = string
+}
