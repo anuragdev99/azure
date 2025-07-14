@@ -20,5 +20,5 @@ variable "admin_username" {
 
 variable "ssh_public_key" {
   type        = string
-  description = "Your SSH public key (passed via GitHub secret SSH_PUBLIC_KEY)"
+  description = "Your SSH public key (passed via TF_VAR_ssh_public_key)"
 }
