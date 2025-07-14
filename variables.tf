@@ -1,24 +1,9 @@
-variable "location" {
-  type    = string
-  default = "eastus"
-}
-
-variable "resource_group_name" {
-  type    = string
-  default = "rg-terraform-vm"
-}
-
-variable "vm_name" {
-  type    = string
-  default = "ubuntu-vm"
-}
-
-variable "admin_username" {
-  type    = string
-  default = "azureuser"
-}
-
 variable "ssh_public_key" {
   type        = string
-  description = "SSH public key (passed via TF_VAR_ssh_public_key from GitHub Secrets)"
+  description = "SSH Public Key for VM login"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "Azure Tenant ID"
 }
