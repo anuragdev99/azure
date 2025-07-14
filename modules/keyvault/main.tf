@@ -10,7 +10,7 @@ resource "azurerm_key_vault" "kv" {
   resource_group_name         = var.rg_name
   tenant_id                   = var.tenant_id
   sku_name                    = "standard"
-  soft_delete_enabled         = true
+ # soft_delete_enabled         = true
   purge_protection_enabled    = false
 
   access_policy {
