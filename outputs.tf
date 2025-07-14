@@ -1,9 +1,9 @@
 output "vm_public_ip" {
-  description = "Public IP address of the Ubuntu VM"
-  value       = azurerm_public_ip.public_ip.ip_address
+  description = "Public IP address of the VM"
+  value       = module.vm.vm_public_ip
 }
 
-output "key_vault_uri" {
-  description = "URI of the provisioned Key Vault"
-  value       = azurerm_key_vault.kv.vault_uri
+output "key_vault_name" {
+  description = "Name of the created Key Vault"
+  value       = module.keyvault.key_vault_name
 }
