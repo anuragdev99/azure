@@ -8,6 +8,7 @@
 
    rg_name        = module.network.rg_name
    location       = module.network.location
+   subnet_id      = module.network.subnet_id
  }
 
  module "keyvault" {
