@@ -4,6 +4,16 @@ variable "tenant_id" {
 }
 
 variable "vm_object_id" {
-  description = "Principal ID of the VM's system‑assigned identity"
+  description = "Principal ID of the VM's identity"
+  type        = string
+}
+
+variable "rg_name" {
+  description = "Resource group name"
+  type        = string
+}
+
+variable "location" {
+  description = "Resource group location"
   type        = string
 }
