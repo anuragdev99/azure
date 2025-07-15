@@ -59,7 +59,8 @@ resource "azurerm_virtual_machine_extension" "install_cert" {
 
   settings = <<SETTINGS
 {
-  "commandToExecute": "az login --identity && export CERT=$(az keyvault certificate list --vault-name kv-vm-${random_string.suffix.result} --query '[0].name' -o tsv) && az keyvault certificate download --vault-name kv-vm-${random_string.suffix.result} --name \\\"$CERT\\\" --file /tmp/$CERT.pfx --encoding Pkcs12"
+  "commandToExecute": "az login --identity && export CERT=$(az keyvault certificate list --vault-name ${var.key_vault_name} --query '[0].name' -o tsv) && az keyvault certificate download --vault-name ${var.key_vault_name} --name \"$CERT\" --file /tmp/$CERT.pfx --encoding Pkcs12"
+
 }
 SETTINGS
 }
