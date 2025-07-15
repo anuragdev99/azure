@@ -59,11 +59,11 @@ resource "azurerm_virtual_machine_extension" "install_cert" {
 
   settings = <<SETTINGS
 {
-  "commandToExecute": "az login --identity && export CERT=$(az keyvault certificate list --vault-name ${var.key_vault_name} --query '[0].name' -o tsv) && az keyvault certificate download --vault-name ${var.key_vault_name} --name \"$CERT\" --file /tmp/$CERT.pfx --encoding Pkcs12"
-
+  "commandToExecute": "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash && az login --identity && export CERT=$(az keyvault certificate list --vault-name ${var.key_vault_name} --query '[0].name' -o tsv) && az keyvault certificate download --vault-name ${var.key_vault_name} --name \\\"$CERT\\\" --file /tmp/$CERT.pfx --encoding Pkcs12"
 }
 SETTINGS
 }
+
 
 output "vm_public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
