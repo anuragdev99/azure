@@ -17,6 +17,7 @@ resource "azurerm_key_vault" "kv" {
     tenant_id = var.tenant_id
     object_id = var.vm_object_id
     secret_permissions = ["Get", "List"]
+    certificate_permissions = ["Get", "List"]
   }
 }
 
