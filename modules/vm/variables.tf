@@ -17,3 +17,7 @@ variable "subnet_id" {
   description = "Subnet ID where VM NIC will attach"
   type        = string
 }
+
+variable "key_vault_name" {
+  type = string
+}
