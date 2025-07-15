@@ -50,6 +50,20 @@ source_image_reference {
  }
 }
 
+resource "azurerm_virtual_machine_extension" "install_cert" {
+  name                 = "install-cert"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.1"
+
+  settings = <<SETTINGS
+{
+  "commandToExecute": "az login --identity && export CERT=$(az keyvault certificate list --vault-name kv-vm-${random_string.suffix.result} --query '[0].name' -o tsv) && az keyvault certificate download --vault-name kv-vm-${random_string.suffix.result} --name \\\"$CERT\\\" --file /tmp/$CERT.pfx --encoding Pkcs12"
+}
+SETTINGS
+}
+
 output "vm_public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
 }
