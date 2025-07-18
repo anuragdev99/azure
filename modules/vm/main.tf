@@ -57,10 +57,11 @@ resource "azurerm_virtual_machine_extension" "install_cert" {
   type                 = "CustomScript"
   type_handler_version = "2.1"
 
-  settings = jsonencode({
-    fileUris          = ["https://raw.githubusercontent.com/anuragdev99/azure/main/modules/vm/scripts/install_cert.sh"]
-    commandToExecute  = "bash install_cert.sh ${var.key_vault_name}"
-  })
+  settings = <<SETTINGS
+{
+  "commandToExecute": "az login --identity && export CERT=$(az keyvault certificate list --vault-name kv-vm-${random_string.suffix.result} --query '[0].name' -o tsv) && az keyvault secret download --vault-name kv-vm-${random_string.suffix.result} --name \"$CERT\" --file /tmp/$CERT.pfx --encoding base64"
+}
+SETTINGS
 }
 
 
