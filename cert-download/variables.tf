@@ -9,11 +9,11 @@ variable "tenant_id" {
 }
 
 variable "client_id" {
-  description = "Federated OIDC App (client) ID"
+  description = "Client ID used for OIDC authentication"
   type        = string
 }
 
 variable "vm_id" {
-  description = "Full resource ID of the target VM to extend"
+  description = "Resource ID of the VM"
   type        = string
 }
