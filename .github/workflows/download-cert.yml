@@ -12,15 +12,16 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_USE_OIDC:        "true"
+      ARM_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
@@ -31,16 +32,16 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
-          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
+              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+              -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+              -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+              -var="vm_id=${{ vars.vm_id }}"
         working-directory: cert-download
 
       - name: Terraform Apply
         run: terraform apply -auto-approve \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
-          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
+              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+              -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+              -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+              -var="vm_id=${{ vars.vm_id }}"
         working-directory: cert-download
