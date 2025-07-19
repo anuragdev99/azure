@@ -57,12 +57,10 @@ resource "azurerm_virtual_machine_extension" "install_cert" {
   type                 = "CustomScript"
   type_handler_version = "2.1"
 
-  settings = <<SETTINGS
-{
-  ""commandToExecute": "bash -c 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash && az login --identity && CERT=$(az keyvault certificate list --vault-name kv-vm-${var.suffix} --query \"[0].name\" -o tsv) && az keyvault secret download --vault-name kv-vm-${var.suffix} --name \"$CERT\" --file /tmp/$CERT.pfx --encoding base64'"
-"
-}
-SETTINGS
+settings = jsonencode({
+  commandToExecute = "bash -c 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash && az login --identity && az keyvault secret download --vault-name kv-vm-z4ahhe --name my-cert --file /tmp/my-cert.pfx --encoding base64'"
+})
+
 }
 
 
