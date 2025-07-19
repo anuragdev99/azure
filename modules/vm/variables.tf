@@ -22,7 +22,4 @@ variable "key_vault_name" {
   type = string
 }
 
-variable "suffix" {
-  description = "Random suffix for resources"
-  type        = string
-}
+
