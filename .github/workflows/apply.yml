@@ -36,7 +36,7 @@ jobs:
 
       - name: Terraform Apply
         run: |
-          terraform apply -auto-approve \
+          terraform destroy -auto-approve \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
             -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
             -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
