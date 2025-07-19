@@ -1,28 +1,24 @@
-name: Terraform Deploy Cert
+name: Deploy Cert to VM
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        shell: bash
-
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -32,10 +28,6 @@ jobs:
       - name: Terraform Init
         working-directory: ./cert-download
         run: terraform init
-
-      - name: Terraform Validate
-        working-directory: ./cert-download
-        run: terraform validate
 
       - name: Terraform Plan
         working-directory: ./cert-download
