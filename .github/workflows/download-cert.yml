@@ -3,33 +3,40 @@ name: Cert Download to VM
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write   # Needed for OIDC login
-      contents: read
-
     env:
+      ARM_USE_OIDC: true
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
         working-directory: cert-download
 
       - name: Terraform Plan
-        run: terraform plan -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="vm_id=/subscriptions/xxxx/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
+        run: terraform plan \
+          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+          -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
         working-directory: cert-download
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="vm_id=/subscriptions/xxxx/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
+        run: terraform apply -auto-approve \
+          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+          -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
         working-directory: cert-download
