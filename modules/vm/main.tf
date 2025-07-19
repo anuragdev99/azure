@@ -49,7 +49,7 @@ source_image_reference {
   version   = "latest"
  }
 }
-
+/*
 resource "azurerm_virtual_machine_extension" "install_cert" {
   name                 = "install-cert"
   virtual_machine_id   = azurerm_linux_virtual_machine.vm.id
@@ -63,7 +63,7 @@ settings = jsonencode({
 })
 
 }
-
+*/
 
 output "vm_public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
