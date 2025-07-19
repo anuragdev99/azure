@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.0"
+      version = ">= 3.67.0"
     }
   }
 
@@ -16,9 +16,5 @@ terraform {
 
 provider "azurerm" {
   features {}
-
-  use_oidc        = true
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
-  client_id       = var.client_id
+  # No auth blocks; Terraform will use the ARM_* env vars + ARM_USE_OIDC
 }
