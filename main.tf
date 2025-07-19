@@ -10,6 +10,8 @@
    location       = module.network.location
    subnet_id      = module.network.subnet_id
    key_vault_name = module.keyvault.key_vault_name
+   suffix         = random_string.suffix.result
+
  }
 
  module "keyvault" {
