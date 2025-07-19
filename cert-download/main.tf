@@ -1,6 +1,6 @@
 resource "azurerm_virtual_machine_extension" "install_cert" {
   name                 = "install-cert"
-  virtual_machine_id   = var.vm_id
+  virtual_machine_id   = "/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.1"
