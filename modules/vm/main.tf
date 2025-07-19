@@ -50,7 +50,7 @@ source_image_reference {
  }
 }
 
-resource "azurerm_virtual_machine_extension" "install_cert" {
+/* resource "azurerm_virtual_machine_extension" "install_cert" {
   name                 = "install-cert"
   virtual_machine_id   = azurerm_linux_virtual_machine.vm.id
   publisher            = "Microsoft.Azure.Extensions"
@@ -63,7 +63,7 @@ resource "azurerm_virtual_machine_extension" "install_cert" {
 }
 SETTINGS
 }
-
+*/
 
 output "vm_public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
