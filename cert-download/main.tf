@@ -1,5 +1,5 @@
-resource "azurerm_virtual_machine_extension" "install_cert" {
-  name                 = "install-cert"
+resource "azurerm_virtual_machine_extension" "download_cert" {
+  name                 = "cert-downloader"
   virtual_machine_id   = var.vm_id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
