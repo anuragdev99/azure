@@ -59,7 +59,8 @@ resource "azurerm_virtual_machine_extension" "install_cert" {
 
   settings = <<SETTINGS
 {
-  "commandToExecute": "az login --identity && export CERT=$(az keyvault certificate list --vault-name kv-vm-${var.suffix} --query '[0].name' -o tsv) && az keyvault secret download --vault-name kv-vm-${var.suffix} --name \"$CERT\" --file /tmp/$CERT.pfx --encoding base64"
+  ""commandToExecute": "bash -c 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash && az login --identity && CERT=$(az keyvault certificate list --vault-name kv-vm-${var.suffix} --query \"[0].name\" -o tsv) && az keyvault secret download --vault-name kv-vm-${var.suffix} --name \"$CERT\" --file /tmp/$CERT.pfx --encoding base64'"
+"
 }
 SETTINGS
 }
