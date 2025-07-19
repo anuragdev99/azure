@@ -1,21 +1,26 @@
-resource "azurerm_virtual_machine_extension" "download_cert" {
-  name                 = "cert-downloader"
-  virtual_machine_id   = var.vm_id
-  publisher            = "Microsoft.Azure.Extensions"
-  type                 = "CustomScript"
-  type_handler_version = "2.1"
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
+}
 
-  settings = jsonencode({
-    commandToExecute = <<-EOT
-      bash -c '
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash &&
-        az login --identity &&
-        az keyvault secret download \
-          --vault-name kv-vm-z4ahhe \
-          --name my-cert \
-          --file /tmp/my-cert.pfx \
-          --encoding base64
-      '
-    EOT
-  })
+resource "azurerm_key_vault" "kv" {
+  name                        = "kv-vm-${random_string.suffix.result}"
+  location                    = var.location
+  resource_group_name         = var.rg_name
+  tenant_id                   = var.tenant_id
+  sku_name                    = "standard"
+ # soft_delete_enabled         = true
+  purge_protection_enabled    = false
+
+  access_policy {
+    tenant_id = var.tenant_id
+    object_id = var.vm_object_id
+    secret_permissions = ["Get", "List"]
+    certificate_permissions = ["Get", "List"]
+  }
+}
+
+output "key_vault_name" {
+  value = azurerm_key_vault.kv.name
 }
