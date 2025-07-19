@@ -1,4 +1,1 @@
-variable "vm_id" {
-  description = "ID of the existing VM"
-  type        = string
-}
+# Empty or used if parameterized later
