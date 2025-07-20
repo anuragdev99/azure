@@ -1,24 +1,26 @@
+# .github/workflows/download-cert.yml
+
 name: Cert Download to VM
 
 on:
   workflow_dispatch:
 
 permissions:
-  id-token: write
-  contents: read
+  id-token: write      # allow OIDC
+  contents: read       # allow checkout
+
+env:
+  ARM_USE_OIDC:        "true"
+  ARM_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 jobs:
   download-cert:
     runs-on: ubuntu-latest
 
-    env:
-      ARM_USE_OIDC:        "true"
-      ARM_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Terraform
@@ -32,18 +34,20 @@ jobs:
 
       - name: Terraform Plan
         working-directory: cert-download
-        run: terraform plan \
-              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-              -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
-              -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-              -var="keyvault_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.KeyVault/vaults/kv-vm-z4ahhe" \
-              -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
+        run: |
+          terraform plan \
+            -var="subscription_id=${{ env.ARM_SUBSCRIPTION_ID }}" \
+            -var="tenant_id=${{ env.ARM_TENANT_ID }}" \
+            -var="client_id=${{ env.ARM_CLIENT_ID }}" \
+            -var="keyvault_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.KeyVault/vaults/kv-vm-z4ahhe" \
+            -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
 
       - name: Terraform Apply
         working-directory: cert-download
-        run: terraform apply -auto-approve \
-              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-              -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
-              -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-              -var="keyvault_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.KeyVault/vaults/kv-vm-z4ahhe" \
-              -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
+        run: |
+          terraform apply -auto-approve \
+            -var="subscription_id=${{ env.ARM_SUBSCRIPTION_ID }}" \
+            -var="tenant_id=${{ env.ARM_TENANT_ID }}" \
+            -var="client_id=${{ env.ARM_CLIENT_ID }}" \
+            -var="keyvault_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.KeyVault/vaults/kv-vm-z4ahhe" \
+            -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
