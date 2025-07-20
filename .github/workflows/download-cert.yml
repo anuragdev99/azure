@@ -32,8 +32,18 @@ jobs:
 
       - name: Terraform Plan
         working-directory: cert-download
-        run: terraform plan
+        run: terraform plan \
+              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+              -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+              -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+              -var="keyvault_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.KeyVault/vaults/kv-vm-z4ahhe" \
+              -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
 
       - name: Terraform Apply
         working-directory: cert-download
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve \
+              -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+              -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" \
+              -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+              -var="keyvault_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.KeyVault/vaults/kv-vm-z4ahhe" \
+              -var="vm_id=/subscriptions/304f61b6-4359-4c2b-ac0b-5c1383e8fb79/resourceGroups/rg-vm-keyvault/providers/Microsoft.Compute/virtualMachines/ubuntu-vm"
