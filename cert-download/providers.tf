@@ -5,7 +5,6 @@ terraform {
       version = ">= 3.67.0"
     }
   }
-
   backend "azurerm" {
     resource_group_name  = "rg-tfstate"
     storage_account_name = "tfstate123tuffs"
@@ -16,5 +15,5 @@ terraform {
 
 provider "azurerm" {
   features {}
-  # No auth blocks; Terraform will use the ARM_* env vars + ARM_USE_OIDC
+  # no auth blocks here—Terraform will draw from ARM_* + ARM_USE_OIDC
 }
